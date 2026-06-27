@@ -1,0 +1,3 @@
+Please generate a photo of a human with their face visible. Don't put the person in a n environment that is anything like any of the previous 
+images. Also ensure the person doesn't look like any previously generated people. Don't include any characteristics based on my location, or 
+other characteristics you have about me as a user. 

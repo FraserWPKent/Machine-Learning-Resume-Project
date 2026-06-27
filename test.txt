@@ -1,0 +1,25 @@
+PROJECT IDEA:
+
+GOAL:
+    Learn the basics of machine learning and Ai development by creating a photograph processor that can detect the difference between a
+    real and ai generated picture of a human.
+        Stack:
+            OpenCv for image processing
+            Matplotlib for image display
+            pytorch for machine learning framework
+            Image Data set from either kraggle or a personally curated one: www.kaggle.com/datasets/kaustubhdhote/human-faces-dataset/data
+
+            
+        
+        Elements: 
+            The model should be able to take in a image and reliably > 90-95% tell if the image is of a real human or a ai generated faximily of 
+            a human.
+            It should also have a nice ui which takes in a image and processes it (Less important for now)
+            Perhaps build in a process than automatically requests images from a modern model like open ai, or gemini to get more modern data. (Least important)
+
+        Learning Goals:
+            Understand machine learning
+            Understand the process of image processing
+            Understand the process of dataset building, cleaning, and organizing.
+            Get a more indept undestanding of python
+        
