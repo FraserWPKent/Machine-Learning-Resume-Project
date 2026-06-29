@@ -3,24 +3,30 @@ import numpy as np
 import matplotlib.pyplot as plt
 import torch as torch
 
-# Read the image
-# input_image = cv.imread('test.jpg')
+#Read the image
+input_image = cv.imread('ImageDataSet\Gemini\Gemini_Generated_Image_5hecnz5hecnz5hec.png')
 
-# # Convert the image to grayscale
-# gray_image = cv.cvtColor(input_image, cv.COLOR_BGR2GRAY)
+resized = cv.resize(input_image, (224,224))
 
-# # Plotting
-# fig, ax = plt.subplots(1, 2, figsize=(16, 8))
-# fig.tight_layout()
+cv.imwrite("TestWritten.jpg", resized)
 
-# # Display original image
-# ax[0].imshow(cv.cvtColor(input_image, cv.COLOR_BGR2RGB))
-# ax[0].set_title("Original Image")
+# Convert the image to grayscale
+#gray_image = cv.cvtColor(input_image, cv.COLOR_BGR2GRAY)
 
-# # Display grayscale image
-# ax[1].imshow(gray_image, cmap='gray')
-# ax[1].set_title("Grayscale Image")
-# plt.show()
+input_image
+
+# Plotting
+fig, ax = plt.subplots(1, 2, figsize=(10, 10))
+#fig.tight_layout()
+
+# Display original image
+ax[0].imshow(cv.cvtColor(resized, cv.COLOR_BGR2RGB))
+#ax[0].set_title("Original Image")
+
+# Display grayscale image
+#ax[1].imshow(gray_image, cmap='gray')
+#ax[1].set_title("Grayscale Image")
+plt.show()
 
 x = torch.rand(5,3)
 print(x)
