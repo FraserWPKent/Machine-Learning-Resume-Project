@@ -3,7 +3,7 @@ import numpy
 import random
 
 #for i in range(1,44):
-for i in range(1, 5):
+for i in range(1, 10):
     currentPath = "TestingImageDataSet\\Gemini\\"+str(i)+".png"
     #print(currentPath)
     currentImage = cv2.imread(currentPath)
