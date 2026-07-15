@@ -10,7 +10,7 @@ import numpy as np
 from PIL import Image
 import matplotlib.pyplot as plt
 import math
-
+import time
 
 
 class AiImageDetectorDataset(Dataset):
@@ -20,24 +20,35 @@ class AiImageDetectorDataset(Dataset):
             transforms.ToTensor()
             ]))
         
-        #TODO: Optimize this code for finding the mean and std of my dataset. It takes too long for my liking
-        print("getting the list")
+        # Note: This mean will be an approximation based on the first sixth of the data. From my testing one sixth of the dataset seems to
+        # give a good enough approximation of the true mean while also executing faste enough to be bearable. (Total time 12 seconds).
+        # If training isint going well maybe modifying this fraction of dataset variable will help making the dataset better conditioned.
+        print("Getting the list")
+        fractionOfDataset = 6
         list = []
-        for i in range(len(self.data)):
+        for i in range(int(len(self.data)/fractionOfDataset)):
             list.append(self.data[i][0])
-        print("Stacking")
+        #print("Stacking")
         image = torch.stack(list, dim=0)
+        
         print("Calculating the mean and std")
         calcMean = image.mean(dim = (0,2,3))
         calcStd = image.std(dim=(0,2,3))
+        
+        #print("Calc Mean\n")
         #print(calcMean)
+        #print("Calc Std\n")
         #print(calcStd)
+        
         newTransform = transforms.Compose([
             transforms.Resize((224,224), antialias=True),
             transforms.ToTensor(),
             transforms.Normalize(mean=calcMean, std=calcStd)
         ])
-        self.data.transform=newTransform                     
+        self.data.transform=newTransform   
+        #timeEnd = time.time()
+        #print("Total Time:" + str(timeEnd-timeStart))
+        #print(timeEnd-timeStart)                  
         # Setup the data
 
     def __len__(self):
@@ -53,7 +64,7 @@ class AiImageDetectorDataset(Dataset):
 
 im = AiImageDetectorDataset("ImageDataSet/archive")
 print(im.__len__())
-print(im.__getitem__(1))
+print(im.__getitem__(19000))
 #print(torch.version.cuda)
 #print(torch.cuda.is_available())
 
