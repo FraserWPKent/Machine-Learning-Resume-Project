@@ -11,6 +11,7 @@ from PIL import Image
 import matplotlib.pyplot as plt
 import math
 import time
+import random
 
 
 class AiImageDetectorDataset(Dataset):
@@ -42,8 +43,11 @@ class AiImageDetectorDataset(Dataset):
         
         newTransform = transforms.Compose([
             transforms.Resize((224,224), antialias=True),
+            transforms.RandomHorizontalFlip(0.05),
+            transforms.RandomRotation([-15, 15]),
             transforms.ToTensor(),
-            transforms.Normalize(mean=calcMean, std=calcStd)
+            transforms.Normalize(mean=calcMean, std=calcStd),
+            
         ])
         self.data.transform=newTransform   
         #timeEnd = time.time()
@@ -62,9 +66,14 @@ class AiImageDetectorDataset(Dataset):
             return self.data.classes
 
 
-im = AiImageDetectorDataset("ImageDataSet/archive")
-print(im.__len__())
-print(im.__getitem__(19000))
+trainingDataset = AiImageDetectorDataset("ImageDataset/Training")
+testingDataset = AiImageDetectorDataset("ImageDataset/Testing")
+trainingLoader = DataLoader(trainingDataset, shuffle=True, batch_size=32)
+testingLoader = DataLoader(testingDataset, shuffle=False, batch_size=32)
+print(trainingDataset.__len__())
+print(testingDataset.__len__())
+#print(trainingDataset.__getitem__(100))
+
 #print(torch.version.cuda)
 #print(torch.cuda.is_available())
 
