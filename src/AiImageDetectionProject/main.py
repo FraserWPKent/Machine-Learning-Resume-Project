@@ -1,5 +1,6 @@
 import database as db
 import modelArchitecturePractice as mp
+import modelArchitecture as ma
 import torch
 import torchvision as vision
 from torch.utils.data import DataLoader
@@ -24,11 +25,18 @@ print(temp2[1])
 print(len(temp[0][0]))
 print(len(temp[0][0][0]))
 
-filter = [[[1,2,3],[4,5,6],[7, 8,9]]]
-bias = [1]
-convoluted = mp.ConvolutionManual(temp[0], bias, filter)
-print(convoluted)
-normalized = mp.BatchNormalize(convoluted[0], 0.5, 0.001)
-print(normalized)
-ReLUed = mp.ReLu(normalized)
-print(ReLUed)
+model = ma.ModelArch()
+features, labels = next(iter(trainingLoader))
+print(labels)
+print(model.forward(features))
+
+
+
+#filter = [[[1,2,3],[4,5,6],[7, 8,9]]]
+#bias = [1]
+#convoluted = mp.ConvolutionManual(temp[0], bias, filter)
+#print(convoluted)
+#normalized = mp.BatchNormalize(convoluted[0], 0.5, 0.001)
+#print(normalized)
+#ReLUed = mp.ReLu(normalized)
+#print(ReLUed)
