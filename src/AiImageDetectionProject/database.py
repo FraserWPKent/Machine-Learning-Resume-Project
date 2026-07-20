@@ -17,11 +17,12 @@ class AiImageDetectorDataset(Dataset):
     def __init__(self, dataDirectory, transform=None, training=True):
         myTransform = [
             transforms.Resize((224, 224), antialias=True), 
-            transforms.RandomHorizontalFlip(0.5),
+            
             transforms.ToTensor()
         ]
         if(training):
             myTransform.append(transforms.Normalize(mean=[0.5215, 0.4260, 0.3793], std=[0.2747, 0.2478, 0.2481]))
+            myTransform.append(transforms.RandomHorizontalFlip(0.5))
         self.data = ImageFolder(dataDirectory, transform=transforms.Compose(myTransform))
         
         ### CODE FOR FINDING THE MEAN AND STD OF A SET OF VALUES. STAYING HERE IN CASE I NEED TO USE IT AGAIN AFTER A DATASET CHANGE

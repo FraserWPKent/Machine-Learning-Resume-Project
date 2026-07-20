@@ -34,7 +34,7 @@ def main():
     #print(len(temp[0][0]))
     #print(len(temp[0][0][0]))
 
-    training.trainingPrep(trainingLoader=trainingLoader, validationLoader=trainingLoader, epochs=5)
+    training.trainingPrep(trainingLoader=trainingLoader, validationLoader=trainingLoader, epochs=1)
 
 
     #model.to(device)

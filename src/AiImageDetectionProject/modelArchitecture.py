@@ -5,8 +5,8 @@ from torch import nn
 class ModelArch(nn.Module):
     def __init__(self):
         super().__init__()
-        #self.conv = ((),(),())
-        self.conv1 = nn.Conv2d(in_channels=3, out_channels=32, kernel_size=3, stride=1, padding=1, padding_mode="zeros")
+        self.convTest = nn.Conv2d(in_channels=3, out_channels=32, kernel_size=3, stride=1, padding=1, padding_mode="zeros")
+        self.conv1 = nn.Conv2d(in_channels=3, out_channels=8, kernel_size=3, stride=1, padding=1, padding_mode="zeros")
         self.conv2 = nn.Conv2d(in_channels=8, out_channels=16, kernel_size=3, stride=1, padding=1, padding_mode="zeros")
         self.conv3 = nn.Conv2d(in_channels=16, out_channels=32, kernel_size=3, stride=1, padding=1, padding_mode="zeros")
         self.batch = nn.BatchNorm2d(num_features=32)
@@ -18,11 +18,13 @@ class ModelArch(nn.Module):
 
     def forward(self, x):
         
+        #x = self.convTest(x)
+
         x = self.conv1(x)
-        #x = self.activation(x)
-        #x = self.conv2(x)
-        #x = self.activation(x)
-        #x = self.conv3(x)
+        x = self.activation(x)
+        x = self.conv2(x)
+        x = self.activation(x)
+        x = self.conv3(x)
         x = self.batch(x)
         x = self.activation(x)
         x = self.pool(x)
