@@ -15,15 +15,19 @@ import time
 
 class AiImageDetectorDataset(Dataset):
     def __init__(self, dataDirectory, transform=None, training=True):
-        myTransform = [
-            transforms.Resize((224, 224), antialias=True), 
-            
-            transforms.ToTensor()
-        ]
-        if(training):
-            myTransform.append(transforms.Normalize(mean=[0.5215, 0.4260, 0.3793], std=[0.2747, 0.2478, 0.2481]))
-            myTransform.append(transforms.RandomHorizontalFlip(0.5))
-        self.data = ImageFolder(dataDirectory, transform=transforms.Compose(myTransform))
+        #myTransform = [
+        #    transforms.Resize((224, 224), antialias=True), 
+        #    transforms.ToTensor(),
+        #    transforms.Normalize(mean=[0.5215, 0.4260, 0.3793], std=[0.2747, 0.2478, 0.2481]),
+        #    transforms.RandomHorizontalFlip(0.5),
+        #    transforms.GaussianBlur(3, [0.5, 0.75])
+        #]
+        #if(training):
+        #    myTransform.append(transforms.Normalize(mean=[0.5215, 0.4260, 0.3793], std=[0.2747, 0.2478, 0.2481]))
+        #    myTransform.append(transforms.RandomHorizontalFlip(0.5))
+        #    myTransform.append(transforms.GaussianBlur(3, [0.5, 0.75]))
+        #self.data = ImageFolder(dataDirectory, transform=transforms.Compose(myTransform))
+        self.data = ImageFolder(dataDirectory, transform=None)
         
         ### CODE FOR FINDING THE MEAN AND STD OF A SET OF VALUES. STAYING HERE IN CASE I NEED TO USE IT AGAIN AFTER A DATASET CHANGE
         # print("Getting the list")

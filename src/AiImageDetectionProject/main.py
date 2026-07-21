@@ -19,6 +19,7 @@ def main():
         # pin_memory included to optimize the process for my training
     trainingLoader = DataLoader(trainingDataset, shuffle=True, batch_size=128, num_workers=8, pin_memory=True)
     testingLoader = DataLoader(testingDataset, shuffle=False, batch_size=128, num_workers=8, pin_memory=True)
+    
     #print(trainingDataset.__len__())
     #print(testingDataset.__len__())
     #print(testingDataset.classes)
@@ -34,7 +35,7 @@ def main():
     #print(len(temp[0][0]))
     #print(len(temp[0][0][0]))
 
-    training.trainingPrep(trainingLoader=trainingLoader, validationLoader=trainingLoader, epochs=1)
+    training.trainingPrep(trainingLoader=trainingLoader, validationLoader=testingLoader, epochs=1)
 
 
     #model.to(device)
