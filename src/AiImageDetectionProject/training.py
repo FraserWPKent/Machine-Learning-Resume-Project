@@ -12,11 +12,14 @@ import random
 def trainingPrep(trainingLoader, validationLoader, epochs):
     model = ma.ModelArch()
     try:
-        with (open("models/savedNames.txt", "r")) as file:
+        #For running on my local machine
+        #with (open("models/savedNames.txt", "r")) as file:
+        #For running on the kaggle notebook
+        with (open("/kaggle/working/Machine-Learning-Resume-Project/models/savedNames.txt", "r")) as file:
             lines = file.readlines()
             if(lines):
                 print(lines[len(lines)-1].strip())
-                model.load_state_dict(torch.load("models/saves/" + lines[len(lines)-1].strip(), weights_only=True))
+                model.load_state_dict(torch.load("/kaggle/working/Machine-Learning-Resume-Project/models/saves" + lines[len(lines)-1].strip(), weights_only=True))
     except IOError:
        print("Didnt Find Any Saved Models") 
 
@@ -54,10 +57,19 @@ def trainingPrep(trainingLoader, validationLoader, epochs):
             fails = 0
         lastAccuracy = accuracy
         print(f"Saving the model: ")
-        with open("models/savedNames.txt", "a") as file:
+        # For my local machine
+        #with open("models/savedNames.txt", "a") as file:
+        
+        #For a kaggle notebook
+        with open("/kaggle/working/Machine-Learning-Resume-Project/models/savedNames.txt", "a") as file:
             name = "model_" + (time.ctime(time.time()).replace(" ", "_").replace(":", "_"))
             file.write(name + "\n")
-            torch.save(model.state_dict(), ("models/saves/" + name))
+            # For running on my local machine
+            #torch.save(model.state_dict(), ("models/saves/" + name))
+
+            # For running on a kaggle notebook
+            torch.save(model.state_dict(), ("/kaggle/working/Machine-Learning-Resume-Project/models/saves/" + name))        
+        
         #if((epoch+1 % 10 == 0) and (mostAccurate < accuracy)):
         #    print("Most Accurate Model Found Saving: " + str(accuracy))
         #    mostAccurate = accuracy
