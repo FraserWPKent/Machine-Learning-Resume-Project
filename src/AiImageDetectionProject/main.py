@@ -10,10 +10,14 @@ from torch.utils.data import DataLoader
 
 
 def main():
-    # Initializing the Build Datasets
-    trainingDataset = db.AiImageDetectorDataset("ImageDataset/Training", training=True)
-    testingDataset = db.AiImageDetectorDataset("ImageDataset/Testing", training=False)
+    # Initializing the Build Datasets when working on my personal machine
+    #trainingDataset = db.AiImageDetectorDataset("ImageDataset/Training", training=True)
+    #testingDataset = db.AiImageDetectorDataset("ImageDataset/Testing", training=False)
 
+    # Initializing the Build Datasets when working on kaggle
+    trainingDataset = db.AiImageDetectorDataset("/kaggle/input/datasets/williamkent1234321/10000-real-vs-fake-faces-stylegan-modified/Training", training=True)
+    testingDataset = db.AiImageDetectorDataset("/kaggle/input/datasets/williamkent1234321/10000-real-vs-fake-faces-stylegan-modified/Testing", training=False)
+    
     #Placing the Datsets into a data loader
         # Batch size 128, with 8 workers has been the most efficient in terms of runtime for my computer
         # pin_memory included to optimize the process for my training
