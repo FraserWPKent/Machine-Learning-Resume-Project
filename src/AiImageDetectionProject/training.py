@@ -11,11 +11,15 @@ import random
 
 def trainingPrep(trainingLoader, validationLoader, epochs):
     model = ma.ModelArch()
-    with (open("models/savedNames.txt", "r")) as file:
-        lines = file.readlines()
-        if(lines):
-            print(lines[len(lines)-1].strip())
-            model.load_state_dict(torch.load("models/saves/" + lines[len(lines)-1].strip(), weights_only=True))
+    try:
+        with (open("models/savedNames.txt", "r")) as file:
+            lines = file.readlines()
+            if(lines):
+                print(lines[len(lines)-1].strip())
+                model.load_state_dict(torch.load("models/saves/" + lines[len(lines)-1].strip(), weights_only=True))
+    except IOError:
+       print("Didnt Find Any Saved Models") 
+
     if(torch.cuda.is_available):
         model.to(torch.device("cuda"))
         
