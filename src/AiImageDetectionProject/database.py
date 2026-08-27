@@ -16,7 +16,7 @@ import time
 class AiImageDetectorDataset(Dataset):
     def __init__(self, dataDirectory, transform=None, training=True):
         myTransform = [
-           transforms.Resize((224, 224), antialias=True), 
+           transforms.Resize((256, 256), antialias=True), 
            transforms.ToTensor(),
            transforms.Normalize(mean=[0.5215, 0.4260, 0.3793], std=[0.2747, 0.2478, 0.2481]),
            transforms.RandomHorizontalFlip(0.5),
