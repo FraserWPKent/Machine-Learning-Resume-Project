@@ -6,10 +6,14 @@ import torch.nn as nn
 import torchvision as vision
 import training
 from torch.utils.data import DataLoader
-
+import sys
 
 
 def main():
+    if(sys.argv.__len__() != 2):
+        print("Not Enough Arguments")
+        sys.exit()
+
     # Initializing the Build Datasets when working on my personal machine
     #trainingDataset = db.AiImageDetectorDataset("ImageDataset/Training", training=True)
     #testingDataset = db.AiImageDetectorDataset("ImageDataset/Testing", training=False)
@@ -21,9 +25,15 @@ def main():
     #Placing the Datsets into a data loader
         # Batch size 128, with 8 workers has been the most efficient in terms of runtime for my computer
         # pin_memory included to optimize the process for my training
-    trainingLoader = DataLoader(trainingDataset, shuffle=True, batch_size=128, num_workers=8, pin_memory=True)
-    testingLoader = DataLoader(testingDataset, shuffle=False, batch_size=128, num_workers=8, pin_memory=True)
+
+    # For Personal computer training
+    #trainingLoader = DataLoader(trainingDataset, shuffle=True, batch_size=128, num_workers=8, pin_memory=True)
+    #testingLoader = DataLoader(testingDataset, shuffle=False, batch_size=128, num_workers=8, pin_memory=True)
     
+    # For Kaggle Training
+    trainingLoader = DataLoader(trainingDataset, shuffle=True, batch_size=128, num_workers=4, pin_memory=True)
+    testingLoader = DataLoader(testingDataset, shuffle=False, batch_size=128, num_workers=4, pin_memory=True)
+
     #print(trainingDataset.__len__())
     #print(testingDataset.__len__())
     #print(testingDataset.classes)
@@ -39,7 +49,8 @@ def main():
     #print(len(temp[0][0]))
     #print(len(temp[0][0][0]))
 
-    training.trainingPrep(trainingLoader=trainingLoader, validationLoader=testingLoader, epochs=5)
+
+    training.trainingPrep(trainingLoader=trainingLoader, validationLoader=testingLoader, epochs=sys.argv[1])
 
 
     #model.to(device)
