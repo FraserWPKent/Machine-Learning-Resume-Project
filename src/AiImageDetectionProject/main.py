@@ -50,7 +50,7 @@ def main():
     #print(len(temp[0][0][0]))
 
 
-    training.trainingPrep(trainingLoader=trainingLoader, validationLoader=testingLoader, epochs=sys.argv[1])
+    training.trainingPrep(trainingLoader=trainingLoader, validationLoader=testingLoader, epochs=int(sys.argv[1]))
 
 
     #model.to(device)
