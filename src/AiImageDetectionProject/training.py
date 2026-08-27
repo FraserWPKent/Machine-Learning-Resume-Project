@@ -158,7 +158,7 @@ def validationBlock(validationLoader, model, optimizer, lossFunction, epochIndex
             #        print("Correct")
             #        total +=1
             total += (predictions==labels.float().view(-1)).sum().item()
-            print(total)
+            #print(total)
         print(total)
         print(len(validationLoader.dataset))
         return total/(len(validationLoader.dataset))
