@@ -18,8 +18,8 @@ def trainingPrep(trainingLoader, validationLoader, epochs):
         with (open("/kaggle/working/Machine-Learning-Resume-Project/models/savedNames.txt", "r")) as file:
             lines = file.readlines()
             if(lines):
-                print(lines[len(lines)-1].strip())
-                model.load_state_dict(torch.load("/kaggle/working/Machine-Learning-Resume-Project/models/saves" + lines[len(lines)-1].strip(), weights_only=True))
+                print("/kaggle/working/Machine-Learning-Resume-Project/models/saves/" + lines[len(lines)-1].strip())
+                model.load_state_dict(torch.load("/kaggle/working/Machine-Learning-Resume-Project/models/saves/" + lines[len(lines)-1].strip(), weights_only=True))
     except IOError:
        print("Didnt Find Any Saved Models") 
 
