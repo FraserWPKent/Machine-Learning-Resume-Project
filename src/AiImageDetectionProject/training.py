@@ -15,11 +15,11 @@ def trainingPrep(trainingLoader, validationLoader, epochs):
         #For running on my local machine
         #with (open("models/savedNames.txt", "r")) as file:
         #For running on the kaggle notebook
-        with (open("/kaggle/working/Machine-Learning-Resume-Project/models/savedNames.txt", "r")) as file:
+        with (open("/kaggle/working/models/savedNames.txt", "r")) as file:
             lines = file.readlines()
             if(lines):
                 print(lines[len(lines)-1].strip())
-                model.load_state_dict(torch.load("/kaggle/working/Machine-Learning-Resume-Project/models/saves" + lines[len(lines)-1].strip(), weights_only=True))
+                model.load_state_dict(torch.load("/kaggle/working/models/saves" + lines[len(lines)-1].strip(), weights_only=True))
     except IOError:
        print("Didnt Find Any Saved Models") 
 
@@ -61,14 +61,14 @@ def trainingPrep(trainingLoader, validationLoader, epochs):
         #with open("models/savedNames.txt", "a") as file:
         
         #For a kaggle notebook
-        with open("/kaggle/working/Machine-Learning-Resume-Project/models/savedNames.txt", "a") as file:
+        with open("/kaggle/working/models/savedNames.txt", "a") as file:
             name = "model_" + (time.ctime(time.time()).replace(" ", "_").replace(":", "_"))
             file.write(name + "\n")
             # For running on my local machine
             #torch.save(model.state_dict(), ("models/saves/" + name))
 
             # For running on a kaggle notebook
-            torch.save(model.state_dict(), ("/kaggle/working/Machine-Learning-Resume-Project/models/saves/" + name))        
+            torch.save(model.state_dict(), ("/kaggle/working/models/saves/" + name))        
         
         #if((epoch+1 % 10 == 0) and (mostAccurate < accuracy)):
         #    print("Most Accurate Model Found Saving: " + str(accuracy))
