@@ -6,7 +6,7 @@ from torch.nn import functional as F
 class ModelArch(nn.Module):
     def __init__(self):
         super().__init__()
-        self.convTest = nn.Conv2d(in_channels=3, out_channels=32, kernel_size=3, stride=1, padding=1, padding_mode="zeros")
+        #self.convTest = nn.Conv2d(in_channels=3, out_channels=32, kernel_size=3, stride=1, padding=1, padding_mode="zeros")
         self.conv1 = nn.Conv2d(in_channels=3, out_channels=16, kernel_size=3, stride=1, padding=1, padding_mode="zeros")
         #self.conv2 = nn.Conv2d(in_channels=8, out_channels=16, kernel_size=3, stride=1, padding=1, padding_mode="zeros")
         self.conv2 = nn.Conv2d(in_channels=16, out_channels=32, kernel_size=3, stride=1, padding=1, padding_mode="zeros")
@@ -17,7 +17,7 @@ class ModelArch(nn.Module):
         self.linear2 = nn.Linear(16, 1)
         self.linear = nn.Linear(32, 1)
         self.globalPool = nn.AdaptiveAvgPool2d(1)
-        self.dropout = nn.Dropout(p=0.4)
+        #self.dropout = nn.Dropout(p=0.4)
 
     def forward(self, x):
 
@@ -35,7 +35,7 @@ class ModelArch(nn.Module):
         x = torch.flatten(x, 1)
         x = self.linear(x)
         x = torch.squeeze(x)
-        x = self.dropout(x)
+        #x = self.dropout(x)
 
         
         #x = self.convTest(x)
