@@ -14,7 +14,7 @@ def main():
         print("Not Enough Arguments")
         sys.exit()
 
-    # Initializing the Build Datasets when working on my personal machine
+    #Initializing the Build Datasets when working on my personal machine
     #trainingDataset = db.AiImageDetectorDataset("ImageDataset/Training", training=True)
     #testingDataset = db.AiImageDetectorDataset("ImageDataset/Testing", training=False)
 

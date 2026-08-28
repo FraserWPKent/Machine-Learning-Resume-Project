@@ -19,11 +19,12 @@ class AiImageDetectorDataset(Dataset):
            transforms.Resize((256, 256), antialias=True), 
            transforms.ToTensor(),
            transforms.Normalize(mean=[0.5215, 0.4260, 0.3793], std=[0.2747, 0.2478, 0.2481]),
-           transforms.RandomHorizontalFlip(0.5),
-           transforms.GaussianBlur(3, [0.5, 0.75])
+           #transforms.RandomHorizontalFlip(0.5),
+           #transforms.GaussianBlur(3, [0.5, 0.75])
         ]
         if(training):
-           myTransform.append(transforms.Normalize(mean=[0.5215, 0.4260, 0.3793], std=[0.2747, 0.2478, 0.2481]))
+           #myTransform.append(transforms.Normalize(mean=[0.5215, 0.4260, 0.3793], std=[0.2747, 0.2478, 0.2481]))
+           #print("Adding the training transforms")
            myTransform.append(transforms.RandomHorizontalFlip(0.5))
            myTransform.append(transforms.GaussianBlur(3, [0.5, 0.75]))
         print("Initializing the dataset")

@@ -18,8 +18,10 @@ def trainingPrep(trainingLoader, validationLoader, epochs):
         with (open("/kaggle/working/Machine-Learning-Resume-Project/models/savedNames.txt", "r")) as file:
             lines = file.readlines()
             if(lines):
-                print("/kaggle/working/Machine-Learning-Resume-Project/models/saves/" + lines[len(lines)-1].strip())
+                #print("/kaggle/working/Machine-Learning-Resume-Project/models/saves/" + lines[len(lines)-1].strip())
                 model.load_state_dict(torch.load("/kaggle/working/Machine-Learning-Resume-Project/models/saves/" + lines[len(lines)-1].strip(), weights_only=True))
+                # Personal Computer Training
+                #model.load_state_dict(torch.load("models/saves/" + lines[len(lines)-1].strip(), weights_only=True))
     except IOError:
        print("Didnt Find Any Saved Models") 
 
@@ -104,9 +106,9 @@ def trainingBlock(trainingLoader, model, optimizer, lossFunction, epochIndex):
     #     ]
     # trainingLoader.dataset.transform = transforms.Compose(myTransform)
     #lastLoss=0.0
-    itemsProcessed = len(trainingLoader)
-    x = 0
-    startTime = time.time()
+    #itemsProcessed = len(trainingLoader)
+    #x = 0
+    #startTime = time.time()
     for i, data in enumerate(trainingLoader):
         items, labels = data[0].to(device), data[1].float().to(device)
         optimizer.zero_grad()
@@ -151,12 +153,11 @@ def validationBlock(validationLoader, model, optimizer, lossFunction, epochIndex
             probabilities = torch.sigmoid(outputs.view(-1))
             predictions = (probabilities>=0.5).float()
 
-            #TODO: FIGURE OUT HOW TO CALCULATE AVERAGES HERE
-            #waste,predicted = torch.max(outputs, 0)
-            #for x in range(predicted.size()):
-            #    if(predicted[x].item() == labels[x].item()):
-            #        print("Correct")
-            #        total +=1
+            #print("Predictions")
+            #print(predictions.unique(return_counts=True))
+            #print("Labels")
+            #print(labels.unique(return_counts=True))
+
             total += (predictions==labels.float().view(-1)).sum().item()
             #print(total)
         print(total)
