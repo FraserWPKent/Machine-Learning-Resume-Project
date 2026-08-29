@@ -33,7 +33,7 @@ def trainingPrep(trainingLoader, validationLoader, epochs):
     
     #Initializes a Adam W optimizer to be used in my training Loop
 
-    optimizer = torch.optim.AdamW(model.parameters(), lr=0.001)
+    optimizer = torch.optim.AdamW(model.parameters(), lr=0.0001)
     #optimizer = torch.optim.SGD(model.parameters())
     #initialTime = time.time()
     fails = 0
