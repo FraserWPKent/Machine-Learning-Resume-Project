@@ -40,7 +40,7 @@ def trainingPrep(trainingLoader, validationLoader, epochs, tag):
     lossFunction = nn.BCEWithLogitsLoss()
     
     #Initializes a Adam W optimizer to be used in my training Loop
-
+    currentLr = 0.001
     optimizer = torch.optim.AdamW(model.parameters(), lr=0.001)
     
     #optimizer = torch.optim.SGD(model.parameters())
@@ -58,14 +58,16 @@ def trainingPrep(trainingLoader, validationLoader, epochs, tag):
         
         print("Epoch: " + str(epoch+1) + "/"+ str(epochs) + " Training Loss: " + str(round(trainingLoss,5)) + " Accuracy: " + str(round(accuracy*100, 3)) + " %") 
 
-        if(accuracy > 0.7):
-            print("Accracy Above 70%. Setting Learning Rate To: 0.0005")
-            for param_group in optimizer.param_groups:
-                param_group['lr'] = 0.0005
-        elif(accuracy > 0.9):
+        if(accuracy > 0.9 and currentLr == 0.0005):
             print("Accracy Above 90%. Setting Learning Rate To: 0.0001")
             for param_group in optimizer.param_groups:
                 param_group['lr'] = 0.0001
+                currentLr = 0.0001
+        elif(accuracy > 0.75 and currentLr == 0.001):
+            print("Accracy Above 75%. Setting Learning Rate To: 0.0005")
+            for param_group in optimizer.param_groups:
+                param_group['lr'] = 0.0005
+                currentLr = 0.0005
 
         if(lastAccuracy < accuracy):
             fails = fails+1
