@@ -13,7 +13,7 @@ class ModelArch(nn.Module):
         self.batch = nn.BatchNorm2d(num_features=32)
         self.activation = nn.ReLU()
         self.pool = nn.MaxPool2d(2)
-        self.dropout = nn.Dropout(p=0.05)
+        self.dropout = nn.Dropout(p=0.1)
         self.linear1 = nn.Linear(32, 16)
         self.linear2 = nn.Linear(16, 1)
         self.linear = nn.Linear(32, 1)
@@ -30,13 +30,14 @@ class ModelArch(nn.Module):
         #x = self.conv3(x)
         x = self.batch(x)
         x = self.activation(x)
+        x = self.dropout(x)
         x = self.pool(x)
 
         x = self.globalPool(x)
         x = torch.flatten(x, 1)
         x = self.linear(x)
         x = torch.squeeze(x)
-        #x = self.dropout(x)
+        
 
         
         #x = self.convTest(x)

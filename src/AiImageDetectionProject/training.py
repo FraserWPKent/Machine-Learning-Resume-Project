@@ -41,7 +41,8 @@ def trainingPrep(trainingLoader, validationLoader, epochs, tag):
     
     #Initializes a Adam W optimizer to be used in my training Loop
 
-    optimizer = torch.optim.AdamW(model.parameters(), lr=0.0001)
+    optimizer = torch.optim.AdamW(model.parameters(), lr=0.001)
+    
     #optimizer = torch.optim.SGD(model.parameters())
     #initialTime = time.time()
     fails = 0
@@ -56,7 +57,14 @@ def trainingPrep(trainingLoader, validationLoader, epochs, tag):
         accuracy = validationBlock(validationLoader, model, optimizer, lossFunction, epoch)
         
         print("Epoch: " + str(epoch+1) + "/"+ str(epochs) + " Training Loss: " + str(round(trainingLoss,5)) + " Accuracy: " + str(round(accuracy*100, 3)) + " %") 
-    
+
+        if(accuracy > 0.7):
+            print("Accracy Above 70%. Setting Learning Rate To: 0.0005")
+            optimizer.param_groups['lr'] = 0.0005
+        elif(accuracy > 0.9):
+            print("Accracy Above 90%. Setting Learning Rate To: 0.0001")
+            optimizer.param_groups['lr'] = 0.0001
+
         if(lastAccuracy < accuracy):
             fails = fails+1
             print(fails)
@@ -98,23 +106,6 @@ def trainingBlock(trainingLoader, model, optimizer, lossFunction, epochIndex):
 
     # Resseeding the transforms every time we train to avoid the model only learning to distinguish my exact training transforms
     random.seed(time.time())
-    # TODO: FIGURE OUT WHY THIS IS PRODUCING PIL IMAGES INSTEAD OF TENSORS EVEN THOUGH IM APPLYING TO TENSOR TO IT
-    # JULY 20TH figure this out soon
-    # myTransform = [
-    #         transforms.Resize((224, 224), antialias=True), 
-    #         transforms.GaussianBlur(3, [random.randint(25, 40)/100.0, random.randint(50, 65)/100.0]),
-    #         transforms.ToTensor(),
-    #         transforms.Normalize(mean=[0.5215, 0.4260, 0.3793], std=[0.2747, 0.2478, 0.2481]),
-    #         #transforms introduced to simulate real world image irregularities that could come into effect when an image is posted to the internet
-    #         # Current transformations:
-    #             # 50 50 flip. Avoids over relying on specific framing that arise in real world photography and ai image generation
-    #         transforms.RandomHorizontalFlip(0.5),
-    #             # Adding some random blurring to the photographs to simulate problems created by repeated reposting, bad data transfers, etc...
-            
-    #             #Introduce cropping algoritms tommorow.
-    #         #transforms.FiveCrop
-    #     ]
-    # trainingLoader.dataset.transform = transforms.Compose(myTransform)
     #lastLoss=0.0
     #itemsProcessed = len(trainingLoader)
     #x = 0
@@ -125,7 +116,6 @@ def trainingBlock(trainingLoader, model, optimizer, lossFunction, epochIndex):
 
 
         outputs = model(items)
-
 
         loss = lossFunction(outputs, labels)
         loss.backward()
