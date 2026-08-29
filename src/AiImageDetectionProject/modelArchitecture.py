@@ -13,11 +13,12 @@ class ModelArch(nn.Module):
         self.batch = nn.BatchNorm2d(num_features=32)
         self.activation = nn.ReLU()
         self.pool = nn.MaxPool2d(2)
+        self.dropout = nn.Dropout(p=0.2)
         self.linear1 = nn.Linear(32, 16)
         self.linear2 = nn.Linear(16, 1)
         self.linear = nn.Linear(32, 1)
         self.globalPool = nn.AdaptiveAvgPool2d(1)
-        #self.dropout = nn.Dropout(p=0.4)
+        
 
     def forward(self, x):
 

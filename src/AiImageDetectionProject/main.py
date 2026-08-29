@@ -10,29 +10,25 @@ import sys
 
 
 def main():
-    if(sys.argv.__len__() != 2):
+    if(sys.argv.__len__() != 3):
         print("Not Enough Arguments")
         sys.exit()
 
-    #Initializing the Build Datasets when working on my personal machine
-    #trainingDataset = db.AiImageDetectorDataset("ImageDataset/Training", training=True)
-    #testingDataset = db.AiImageDetectorDataset("ImageDataset/Testing", training=False)
-
-    # Initializing the Build Datasets when working on kaggle
-    trainingDataset = db.AiImageDetectorDataset("/kaggle/input/datasets/williamkent1234321/10000-real-vs-fake-faces-stylegan-modified/Training", training=True)
-    testingDataset = db.AiImageDetectorDataset("/kaggle/input/datasets/williamkent1234321/10000-real-vs-fake-faces-stylegan-modified/Testing", training=False)
     
-    #Placing the Datsets into a data loader
-        # Batch size 128, with 8 workers has been the most efficient in terms of runtime for my computer
-        # pin_memory included to optimize the process for my training
-
-    # For Personal computer training
-    #trainingLoader = DataLoader(trainingDataset, shuffle=True, batch_size=128, num_workers=8, pin_memory=True)
-    #testingLoader = DataLoader(testingDataset, shuffle=False, batch_size=128, num_workers=8, pin_memory=True)
-    
-    # For Kaggle Training
-    trainingLoader = DataLoader(trainingDataset, shuffle=True, batch_size=128, num_workers=4, pin_memory=True)
-    testingLoader = DataLoader(testingDataset, shuffle=False, batch_size=128, num_workers=4, pin_memory=True)
+    #trainingLoader
+    #testingLoader
+    if(int(sys.argv[2])):
+        # Initializing the Build Datasets when working on kaggle
+        trainingDataset = db.AiImageDetectorDataset("/kaggle/input/datasets/williamkent1234321/10000-real-vs-fake-faces-stylegan-modified/Training", training=True)
+        testingDataset = db.AiImageDetectorDataset("/kaggle/input/datasets/williamkent1234321/10000-real-vs-fake-faces-stylegan-modified/Testing", training=False)
+        trainingLoader = DataLoader(trainingDataset, shuffle=True, batch_size=128, num_workers=4, pin_memory=True)
+        testingLoader = DataLoader(testingDataset, shuffle=False, batch_size=128, num_workers=4, pin_memory=True)
+    else:
+        #Initializing the Build Datasets when working on my personal machine
+        trainingDataset = db.AiImageDetectorDataset("ImageDataset/Training", training=True)
+        testingDataset = db.AiImageDetectorDataset("ImageDataset/Testing", training=False)
+        trainingLoader = DataLoader(trainingDataset, shuffle=True, batch_size=128, num_workers=8, pin_memory=True)
+        testingLoader = DataLoader(testingDataset, shuffle=False, batch_size=128, num_workers=8, pin_memory=True)
 
     #print(trainingDataset.__len__())
     #print(testingDataset.__len__())
@@ -50,7 +46,7 @@ def main():
     #print(len(temp[0][0][0]))
 
 
-    training.trainingPrep(trainingLoader=trainingLoader, validationLoader=testingLoader, epochs=int(sys.argv[1]))
+    training.trainingPrep(trainingLoader=trainingLoader, validationLoader=testingLoader, epochs=int(sys.argv[1]), tag=int(sys.argv[2]))
 
 
     #model.to(device)
