@@ -60,10 +60,12 @@ def trainingPrep(trainingLoader, validationLoader, epochs, tag):
 
         if(accuracy > 0.7):
             print("Accracy Above 70%. Setting Learning Rate To: 0.0005")
-            optimizer.param_groups['lr'] = 0.0005
+            for param_group in optimizer.param_groups:
+                param_group['lr'] = 0.0005
         elif(accuracy > 0.9):
             print("Accracy Above 90%. Setting Learning Rate To: 0.0001")
-            optimizer.param_groups['lr'] = 0.0001
+            for param_group in optimizer.param_groups:
+                param_group['lr'] = 0.0001
 
         if(lastAccuracy < accuracy):
             fails = fails+1
