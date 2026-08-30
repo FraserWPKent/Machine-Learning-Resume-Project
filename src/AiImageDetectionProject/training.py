@@ -18,17 +18,9 @@ def trainingPrep(trainingLoader, validationLoader, epochs, tag):
         filePath="models/"
     
     try:
-        #For running on my local machine
-        #with (open("models/savedNames.txt", "r")) as file:
-        #For running on the kaggle notebook
-        #with (open("/kaggle/working/Machine-Learning-Resume-Project/models/savedNames.txt", "r")) as file:
         with (open(filePath+"savedNames.txt", "r")) as file:
             lines = file.readlines()
             if(lines):
-                #print("/kaggle/working/Machine-Learning-Resume-Project/models/saves/" + lines[len(lines)-1].strip())
-                #model.load_state_dict(torch.load("/kaggle/working/Machine-Learning-Resume-Project/models/saves/" + lines[len(lines)-1].strip(), weights_only=True))
-                # Personal Computer Training
-                #model.load_state_dict(torch.load("models/saves/" + lines[len(lines)-1].strip(), weights_only=True))
                 model.load_state_dict(torch.load(filePath+"saves/"  + lines[len(lines)-1].strip(), weights_only=True))
     except IOError:
        print("Didnt Find Any Saved Models") 
@@ -42,20 +34,19 @@ def trainingPrep(trainingLoader, validationLoader, epochs, tag):
     #Initializes a Adam W optimizer to be used in my training Loop
     currentLr = 0.001
     optimizer = torch.optim.AdamW(model.parameters(), lr=0.001)
-    
     #optimizer = torch.optim.SGD(model.parameters())
-    #initialTime = time.time()
-    fails = 0
-    lastAccuracy = 1
-    #mostAccurate = -1
+
+    # fails = 0
+    # lastAccuracy = 1
+    mostAccurate = -1
     for epoch in range(epochs):
         print("Epoch: " + str(epoch))
         model.train()
         trainingLoss =trainingBlock(trainingLoader, model, optimizer, lossFunction, epoch)
-        print("Trained")
+        # print("Trained")
         model.eval()
         accuracy = validationBlock(validationLoader, model, optimizer, lossFunction, epoch)
-        
+
         print("Epoch: " + str(epoch+1) + "/"+ str(epochs) + " Training Loss: " + str(round(trainingLoss,5)) + " Accuracy: " + str(round(accuracy*100, 3)) + " %") 
 
         if(accuracy > 0.9 and currentLr == 0.0005):
@@ -69,44 +60,35 @@ def trainingPrep(trainingLoader, validationLoader, epochs, tag):
                 param_group['lr'] = 0.0005
                 currentLr = 0.0005
 
-        if(lastAccuracy < accuracy):
-            fails = fails+1
-            print(fails)
-            if(fails >= 10):
-                print("Model No Longer Becoming More Accurate")
-                break
-        else:
-            fails = 0
-        lastAccuracy = accuracy
-        print(f"Saving the model: ")
-        # For my local machine
-        #with open("models/savedNames.txt", "a") as file:
-        
-        #For a kaggle notebook
-        #with open("/kaggle/working/Machine-Learning-Resume-Project/models/savedNames.txt", "a") as file:
-        with open(filePath+"savedNames.txt", "a") as file:
-            name = "model_" + (time.ctime(time.time()).replace(" ", "_").replace(":", "_"))
-            file.write(name + "\n")
-            # For running on my local machine
-            #torch.save(model.state_dict(), ("models/saves/" + name))
+        # if(lastAccuracy < accuracy):
+        #     fails = fails+1
+        #     print(fails)
+        #     if(fails >= 10):
+        #         print("Model No Longer Becoming More Accurate")
+        #         break
+        # else:
+        #     fails = 0
+        # lastAccuracy = accuracy
 
-            # For running on a kaggle notebook
-            #torch.save(model.state_dict(), ("/kaggle/working/Machine-Learning-Resume-Project/models/saves/" + name))
-            torch.save(model.state_dict(), (filePath+"saves/"+name))        
-        
-        #if((epoch+1 % 10 == 0) and (mostAccurate < accuracy)):
-        #    print("Most Accurate Model Found Saving: " + str(accuracy))
-        #    mostAccurate = accuracy
-        #    torch.save(model, ("models/testingModelSave" + str(datetime.date().month) +":" + str(datetime.date().day) + ":" + str(time.time())))
-            #Insert a save here
-    #print((time.time()-initialTime))
 
+        if(accuracy > mostAccurate or epoch%10 == 0):
+            if(accuracy > mostAccurate):
+                mostAccurate = accuracy
+            print(f"Saving the model: ")
+            with open(filePath+"savedNames.txt", "a") as file:
+                name = "model_" + (time.ctime(time.time()).replace(" ", "_").replace(":", "_"))
+                file.write(name + "\n")
+                torch.save(model.state_dict(), (filePath+"saves/"+name))        
+            
 
 def trainingBlock(trainingLoader, model, optimizer, lossFunction, epochIndex):
 
     device = torch.device("cuda")
 
     totalLoss = 0.0
+
+    # Does this do anything??? I dont remember writing this and I dont know if it does anything but its such a small thing that
+    # I'm going to leave it assuming the me who wrote this wasnt totally insane
 
     # Resseeding the transforms every time we train to avoid the model only learning to distinguish my exact training transforms
     random.seed(time.time())
@@ -144,9 +126,6 @@ def validationBlock(validationLoader, model, optimizer, lossFunction, epochIndex
     device = torch.device("cuda")
     loss = 0.0
     total = 0.0
-
-    # Resseeding the transforms every time we train to avoid the model only learning to distinguish my exact training transforms  
-    #random.seed(time.time())
    
     with torch.no_grad():
         for i, data in enumerate(validationLoader):
