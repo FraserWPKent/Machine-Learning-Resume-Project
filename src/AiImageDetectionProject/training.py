@@ -49,17 +49,17 @@ def trainingPrep(trainingLoader, validationLoader, epochs, tag):
 
         print("Epoch: " + str(epoch+1) + "/"+ str(epochs) + " Training Loss: " + str(round(trainingLoss,5)) + " Accuracy: " + str(round(accuracy*100, 3)) + " %") 
 
-        if(accuracy > 0.95 and currentLr == 0.0001):
+        if(accuracy > 0.975 and currentLr == 0.0001):
             print("Accracy Above 90%. Setting Learning Rate To: 0.0001")
             for param_group in optimizer.param_groups:
                 param_group['lr'] = 0.00001
                 currentLr = 0.00001
-        elif(accuracy > 0.9 and currentLr == 0.0005):
+        elif(accuracy > 0.95 and currentLr == 0.0005):
             print("Accracy Above 90%. Setting Learning Rate To: 0.0001")
             for param_group in optimizer.param_groups:
                 param_group['lr'] = 0.0001
                 currentLr = 0.0001
-        elif(accuracy > 0.75 and currentLr == 0.001):
+        elif(accuracy > 0.9 and currentLr == 0.001):
             print("Accracy Above 75%. Setting Learning Rate To: 0.0005")
             for param_group in optimizer.param_groups:
                 param_group['lr'] = 0.0005
