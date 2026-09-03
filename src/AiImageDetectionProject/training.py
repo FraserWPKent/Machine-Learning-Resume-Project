@@ -21,6 +21,7 @@ def trainingPrep(trainingLoader, validationLoader, epochs, tag):
         with (open(filePath+"savedNames.txt", "r")) as file:
             lines = file.readlines()
             if(lines):
+                print("Found A Model")
                 model.load_state_dict(torch.load(filePath+"saves/"  + lines[len(lines)-1].strip(), weights_only=True))
     except IOError:
        print("Didnt Find Any Saved Models") 
