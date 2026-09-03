@@ -18,7 +18,8 @@ class AiImageDetectorDataset(Dataset):
         myTransform = [
            transforms.Resize((256, 256), antialias=True), 
            transforms.ToTensor(),
-           transforms.Normalize(mean=[0.5215, 0.4260, 0.3793], std=[0.2747, 0.2478, 0.2481]),
+           #transforms.Normalize(mean=[0.5215, 0.4260, 0.3793], std=[0.2747, 0.2478, 0.2481]),
+           transforms.Normalize(mean=[-0.0349,  0.0206,  0.0505], std=[0.9889, 1.0098, 1.0235]),
            #transforms.RandomHorizontalFlip(0.5),
            #transforms.GaussianBlur(3, [0.5, 0.75])
         ]
@@ -27,6 +28,8 @@ class AiImageDetectorDataset(Dataset):
            #print("Adding the training transforms")
            myTransform.append(transforms.RandomHorizontalFlip(0.5))
            myTransform.append(transforms.GaussianBlur(3, [0.5, 0.75]))
+           myTransform.append(transforms.RandomRotation(degrees=15))
+           myTransform.append(transforms.ColorJitter(brightness=0.2, contrast=0.2, hue=0.1, saturation=0.2))
         print("Initializing the dataset")
         self.data = ImageFolder(dataDirectory, transform=transforms.Compose(myTransform))
         print("Finished Initializing the dataset")

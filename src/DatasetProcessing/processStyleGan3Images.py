@@ -12,14 +12,13 @@ def main():
     oldImages = os.listdir(filePath)
 
     for fileName in oldImages:
-        print(filePath+"/"+fileName)
+        #print(filePath+"/"+fileName)
         #time.sleep(1)
         if(os.path.exists(filePath+"/"+fileName)):
             print("Old Image Exists Removing It")
             os.remove(filePath+"/"+fileName)
 
-    time.sleep(10)
-
+    #time.sleep(10)
 
     total =0 
     #for x in range(0, 100):
@@ -41,7 +40,7 @@ def main():
 
         #time.sleep(3)        
         h,w,c = foreground.shape
-        rgbThreshold = 220
+        rgbThreshold = 200
 
         white_mask = cv2.inRange(foreground, np.array([rgbThreshold, rgbThreshold, rgbThreshold], dtype="uint8"), np.array([255, 255, 255], dtype="uint8"))
             #distance = np.max(255 - foreground, axis=2)
@@ -77,7 +76,7 @@ def main():
         print(percentage)
 
         #If to much of the image is white dont save it        
-        if(percentage < 0.50):
+        if(percentage < 0.35):
             continue
 
         alpha = cv2.bitwise_not(flood)
@@ -125,11 +124,11 @@ def main():
         initialRow = widthCenter-widthOffset
 
         if (True):
-            cv2.imshow("Image", dest)
-            key = cv2.waitKey(0)
-            print(key)
-            if (key == 113):
-                exit()
+            #cv2.imshow("Image", dest)
+            #key = cv2.waitKey(0)
+            #print(key)
+            #if (key == 113):
+            #    exit()
             total = total+1
             print("Saving: " + fileName)
             cv2.imwrite("src/DatasetProcessing/StyleGanImagesWithBackgrounds/WBG" + fileName, dest)
