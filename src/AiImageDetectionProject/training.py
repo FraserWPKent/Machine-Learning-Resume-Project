@@ -1,6 +1,7 @@
 import torch
 import modelArchitecture as ma
 from torch.utils.data import Dataset, DataLoader
+import numpy as np
 import torch.nn as nn
 import time
 import datetime
@@ -61,9 +62,9 @@ def trainingPrep(trainingLoader, validationLoader, epochs, tag):
     # fails = 0
     # lastAccuracy = 1
     mostAccurate = -1
-    previousAccuracies = [0.0,0.0,0.0,0.0,0.0]
+    previousAccuracies = np.zeros(10)
     for epoch in range(epochs):
-        print("Epoch: " + str(epoch))
+        print("Epoch: " + str(epoch+1))
         model.train()
         trainingLoss =trainingBlock(trainingLoader, model, optimizer, lossFunction, epoch)
         # print("Trained")
@@ -105,7 +106,7 @@ def trainingPrep(trainingLoader, validationLoader, epochs, tag):
                 mostAccurate = accuracy
             print(f"Saving the model: ")
             with open(filePath+"savedNames.txt", "a") as file:
-                name = "model_" + str(accuracy) + "_" + str(trainingLoss) + (time.ctime(time.time()).replace(" ", "_").replace(":", "_"))
+                name = "model_" + str(accuracy*100)[0:4] + "_" + str(trainingLoss)[0:6] + "_" + (time.ctime(time.time()).replace(" ", "_").replace(":", "_"))
                 file.write(name + "\n")
                 torch.save(model.state_dict(), (filePath+"saves/"+name))        
             
