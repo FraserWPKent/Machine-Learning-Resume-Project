@@ -8,6 +8,27 @@ import torchvision.transforms as transforms
 import random
 
 
+def adjustLearningRate(accuracies, currentLearningRate):
+
+    increasing = 0
+    decreasing = 0
+    for i in range(1, len(accuracies)):
+        if(accuracies[i-1] > accuracies[i]):
+            decreasing+=1
+        else:
+            increasing+=1
+    #If our accuracy is alternating or going down alot more than its going up then bring down the learning rate a decent amount to stabalize it 
+    print(increasing)
+    print(decreasing)
+    if(abs(decreasing-increasing) <= 1):
+        
+        print("Lowering the Learning Rate")
+        currentLearningRate *= 0.20
+
+    return currentLearningRate
+
+
+
 
 def trainingPrep(trainingLoader, validationLoader, epochs, tag):
     model = ma.ModelArch()
@@ -40,6 +61,7 @@ def trainingPrep(trainingLoader, validationLoader, epochs, tag):
     # fails = 0
     # lastAccuracy = 1
     mostAccurate = -1
+    previousAccuracies = [0.0,0.0,0.0,0.0,0.0]
     for epoch in range(epochs):
         print("Epoch: " + str(epoch))
         model.train()
@@ -50,39 +72,40 @@ def trainingPrep(trainingLoader, validationLoader, epochs, tag):
 
         print("Epoch: " + str(epoch+1) + "/"+ str(epochs) + " Training Loss: " + str(round(trainingLoss,5)) + " Accuracy: " + str(round(accuracy*100, 3)) + " %") 
 
-        if(accuracy > 0.975 and currentLr == 0.0001):
-            print("Accracy Above 90%. Setting Learning Rate To: 0.0001")
-            for param_group in optimizer.param_groups:
-                param_group['lr'] = 0.00001
-                currentLr = 0.00001
-        elif(accuracy > 0.95 and currentLr == 0.0005):
-            print("Accracy Above 90%. Setting Learning Rate To: 0.0001")
-            for param_group in optimizer.param_groups:
-                param_group['lr'] = 0.0001
-                currentLr = 0.0001
-        elif(accuracy > 0.9 and currentLr == 0.001):
-            print("Accracy Above 75%. Setting Learning Rate To: 0.0005")
-            for param_group in optimizer.param_groups:
-                param_group['lr'] = 0.0005
-                currentLr = 0.0005
 
-        # if(lastAccuracy < accuracy):
-        #     fails = fails+1
-        #     print(fails)
-        #     if(fails >= 10):
-        #         print("Model No Longer Becoming More Accurate")
-        #         break
-        # else:
-        #     fails = 0
-        # lastAccuracy = accuracy
+        for i in range(0, 4):
+            previousAccuracies[i] = previousAccuracies[i+1]
+        previousAccuracies[4] = accuracy
 
+        newLr = adjustLearningRate(previousAccuracies, currentLr)
 
-        if(accuracy > mostAccurate or epoch%10 == 0):
+        if(newLr != currentLr):
+            for param_group in optimizer.param_groups:
+                param_group['lr'] = newLr
+                currentLr = newLr
+
+        # if(accuracy > 0.975 and currentLr == 0.0001):
+        #     print("Accracy Above 90%. Setting Learning Rate To: 0.0001")
+        #     for param_group in optimizer.param_groups:
+        #         param_group['lr'] = 0.00001
+        #         currentLr = 0.00001
+        # elif(accuracy > 0.95 and currentLr == 0.0005):
+        #     print("Accracy Above 90%. Setting Learning Rate To: 0.0001")
+        #     for param_group in optimizer.param_groups:
+        #         param_group['lr'] = 0.0001
+        #         currentLr = 0.0001
+        # elif(accuracy > 0.9 and currentLr == 0.001):
+        #     print("Accracy Above 75%. Setting Learning Rate To: 0.0005")
+        #     for param_group in optimizer.param_groups:
+        #         param_group['lr'] = 0.0005
+        #         currentLr = 0.0005
+
+        if(accuracy > mostAccurate or epoch+1%10 == 0):
             if(accuracy > mostAccurate):
                 mostAccurate = accuracy
             print(f"Saving the model: ")
             with open(filePath+"savedNames.txt", "a") as file:
-                name = "model_" + (time.ctime(time.time()).replace(" ", "_").replace(":", "_"))
+                name = "model_" + str(accuracy) + "_" + str(trainingLoss) + (time.ctime(time.time()).replace(" ", "_").replace(":", "_"))
                 file.write(name + "\n")
                 torch.save(model.state_dict(), (filePath+"saves/"+name))        
             
