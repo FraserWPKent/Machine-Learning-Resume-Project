@@ -12,20 +12,33 @@ import random
 def adjustLearningRate(accuracies, currentLearningRate):
 
     increasing = 0
+    massiveJumps = 0
     decreasing = 0
+    #Loop that tries to detect massive alternating swings in accuracy and lowers the accuracy if they are happening to much
     for i in range(1, len(accuracies)):
+        if(accuracies[i-1] == 0):
+            return currentLearningRate
         if(accuracies[i-1] > accuracies[i]):
             decreasing+=1
         else:
             increasing+=1
-    #If our accuracy is alternating or going down alot more than its going up then bring down the learning rate a decent amount to stabalize it 
-    print(increasing)
-    print(decreasing)
-    if(abs(decreasing-increasing) <= 1):
-        
+        if(abs(accuracies[i-1]-accuracies[i]) > 0.2):
+            massiveJumps+=1
+
+    #If the accuracy is either alternating or decreasing alot and there are a significant number of large jumps in accuracy 
+    # then we lower the Learning Rate my a large amount
+    if(abs(decreasing-increasing) <= 1 and massiveJumps > 5):
         print("Lowering the Learning Rate")
         currentLearningRate *= 0.20
+    #If there is alot of alternating but not many large jumps then lower the learning rate by a small amounnt
+    elif(abs(decreasing-increasing) <= 1):
+        currentLearningRate *= 0.80
+    #We're getting consistant increases in accuracy raise the learning rate slightly to test if we can aford to traing a bit faster without
+    #overshooting
+    elif(increasing >= len(accuracies)-2):
+        currentLearningRate *= 1.15
 
+    print(currentLearningRate)
     return currentLearningRate
 
 
@@ -45,6 +58,7 @@ def trainingPrep(trainingLoader, validationLoader, epochs, tag):
             if(lines):
                 print("Found A Model")
                 model.load_state_dict(torch.load(filePath+"saves/"  + lines[len(lines)-1].strip(), weights_only=True))
+            file.close()
     except IOError:
        print("Didnt Find Any Saved Models") 
 
@@ -80,10 +94,13 @@ def trainingPrep(trainingLoader, validationLoader, epochs, tag):
 
         newLr = adjustLearningRate(previousAccuracies, currentLr)
 
+        #Changing the Learning Rate to half the old rate and resetting the previous accuracies rate so we can re check if 
         if(newLr != currentLr):
             for param_group in optimizer.param_groups:
                 param_group['lr'] = newLr
                 currentLr = newLr
+            for i in range(len(previousAccuracies)):
+                previousAccuracies[i] = 0.0
 
         # if(accuracy > 0.975 and currentLr == 0.0001):
         #     print("Accracy Above 90%. Setting Learning Rate To: 0.0001")
@@ -108,7 +125,8 @@ def trainingPrep(trainingLoader, validationLoader, epochs, tag):
             with open(filePath+"savedNames.txt", "a") as file:
                 name = "model_" + str(accuracy*100)[0:4] + "_" + str(trainingLoss)[0:6] + "_" + (time.ctime(time.time()).replace(" ", "_").replace(":", "_"))
                 file.write(name + "\n")
-                torch.save(model.state_dict(), (filePath+"saves/"+name))        
+                torch.save(model.state_dict(), (filePath+"saves/"+name))
+                file.close()        
             
 
 def trainingBlock(trainingLoader, model, optimizer, lossFunction, epochIndex):
