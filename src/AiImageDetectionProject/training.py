@@ -7,39 +7,51 @@ import time
 import datetime
 import torchvision.transforms as transforms
 import random
+import math
+
+minimumLearningRate = 0.000001
 
 
-def adjustLearningRate(accuracies, currentLearningRate):
+def adjustLearningRate(currentLR, currentEpoch, endEpoch):
+    return minimumLearningRate + (currentLR-minimumLearningRate)*((1+math.cos((currentEpoch+1)*math.pi/endEpoch))/(1+math.cos((currentEpoch*math.pi)/(endEpoch))))       
 
-    increasing = 0
-    massiveJumps = 0
-    decreasing = 0
-    #Loop that tries to detect massive alternating swings in accuracy and lowers the accuracy if they are happening to much
-    for i in range(1, len(accuracies)):
-        if(accuracies[i-1] == 0):
-            return currentLearningRate
-        if(accuracies[i-1] > accuracies[i]):
-            decreasing+=1
-        else:
-            increasing+=1
-        if(abs(accuracies[i-1]-accuracies[i]) > 0.2):
-            massiveJumps+=1
+# def oldAdjustLearningRate(accuracies, currentLearningRate):
 
-    #If the accuracy is either alternating or decreasing alot and there are a significant number of large jumps in accuracy 
-    # then we lower the Learning Rate my a large amount
-    if(abs(decreasing-increasing) <= 1 and massiveJumps > 5):
-        print("Lowering the Learning Rate")
-        currentLearningRate *= 0.20
-    #If there is alot of alternating but not many large jumps then lower the learning rate by a small amounnt
-    elif(abs(decreasing-increasing) <= 1):
-        currentLearningRate *= 0.80
-    #We're getting consistant increases in accuracy raise the learning rate slightly to test if we can aford to traing a bit faster without
-    #overshooting
-    elif(increasing >= len(accuracies)-2):
-        currentLearningRate *= 1.15
+#     increasing = 0
+#     massiveJumps = 0
+#     decreasing = 0
+#     #Loop that tries to detect massive alternating swings in accuracy and lowers the accuracy if they are happening to much
+#     for i in range(1, len(accuracies)):
+#         if(accuracies[i-1] == 0):
+#             #print("Not Enough Data To Adjust Learning Rate")
+#             return currentLearningRate
+#         if(accuracies[i-1] > accuracies[i]):
+#             decreasing+=1
+#         else:
+#             increasing+=1
+#         if(abs(accuracies[i-1]-accuracies[i]) > 0.2):
+#             massiveJumps+=1
 
-    print(currentLearningRate)
-    return currentLearningRate
+    
+#     print("Alternating: " + str(abs(decreasing-increasing)))
+#     print("# Massive Jumps: " + str(massiveJumps))
+
+
+#     #If the accuracy is either alternating or decreasing alot and there are a significant number of large jumps in accuracy 
+#     # then we lower the Learning Rate my a large amount
+#     if(abs(decreasing-increasing) <= 1 and massiveJumps > 5):
+#         print("Lowering the Learning Rate")
+#         currentLearningRate *= 0.20
+#     #If there is alot of alternating but not many large jumps then lower the learning rate by a small amounnt
+#     elif(abs(decreasing-increasing) <= 1):
+#         currentLearningRate *= 0.80
+#     #We're getting consistant increases in accuracy raise the learning rate slightly to test if we can aford to traing a bit faster without
+#     #overshooting
+#     elif(decreasing <= 2):
+#         currentLearningRate *= 1.15
+
+#     print(currentLearningRate)
+#     return currentLearningRate
 
 
 
@@ -76,7 +88,7 @@ def trainingPrep(trainingLoader, validationLoader, epochs, tag):
     # fails = 0
     # lastAccuracy = 1
     mostAccurate = -1
-    previousAccuracies = np.zeros(10)
+    #previousAccuracies = np.zeros(6)
     for epoch in range(epochs):
         print("Epoch: " + str(epoch+1))
         model.train()
@@ -88,19 +100,19 @@ def trainingPrep(trainingLoader, validationLoader, epochs, tag):
         print("Epoch: " + str(epoch+1) + "/"+ str(epochs) + " Training Loss: " + str(round(trainingLoss,5)) + " Accuracy: " + str(round(accuracy*100, 3)) + " %") 
 
 
-        for i in range(0, 4):
-            previousAccuracies[i] = previousAccuracies[i+1]
-        previousAccuracies[4] = accuracy
+        #for i in range(0, 4):
+        #    previousAccuracies[i] = previousAccuracies[i+1]
+        #previousAccuracies[4] = accuracy
 
-        newLr = adjustLearningRate(previousAccuracies, currentLr)
-
+        newLr = adjustLearningRate(currentLr, epoch, epochs)
+        print(newLr)
         #Changing the Learning Rate to half the old rate and resetting the previous accuracies rate so we can re check if 
         if(newLr != currentLr):
             for param_group in optimizer.param_groups:
                 param_group['lr'] = newLr
                 currentLr = newLr
-            for i in range(len(previousAccuracies)):
-                previousAccuracies[i] = 0.0
+            #for i in range(len(previousAccuracies)):
+            #    previousAccuracies[i] = 0.0
 
         # if(accuracy > 0.975 and currentLr == 0.0001):
         #     print("Accracy Above 90%. Setting Learning Rate To: 0.0001")
