@@ -38,22 +38,18 @@ def testngSelenium():
     
         #driver.quit()
 
-def requestImageURLS(numReqs, file, coreTag, unacceptableWords, curPage, key, ids):
+def requestImageURLS(numReqs, file, tags, unacceptableWords, curPage, key, ids):
     totalAccepted = 0
     endPage = curPage+numReqs
-    print("Getting Images For " + coreTag)
+    #print("Getting Images For " + coreTag)
     for i in range(curPage, endPage):
         print("Page: " + str(i))
         # constructing the rest api url
-        if(coreTag != ""):
-            url = "https://pixabay.com/api/?key=" + key + "&q=" + coreTag
-            for x in range(2, sys.argv.__len__()):
-                url += "+" + sys.argv[x]
-        else:
-            url = "https://pixabay.com/api/?key=" + key + "&q=" + sys.argv[2]
-            for x in range(3, sys.argv.__len__()):
-                url += "+" + sys.argv[x]
-        url += "&image_type=photo&page="+str(i+1)+"&per_page=50&safesearch=true&category=people"
+        
+        url = "https://pixabay.com/api/?key=" + key + "&q=" + tags[0]
+        for x in range(1, len(tags)):
+                url += "+" + tags[x]
+        url += "&image_type=photo&page="+str(i+1)+"&per_page=100&safesearch=true&category=people"
         req = requests.get(url=url)
         if (req.status_code != 200):
             print("Failed Request. Status Code: " + str(req.status_code))
@@ -61,7 +57,7 @@ def requestImageURLS(numReqs, file, coreTag, unacceptableWords, curPage, key, id
             if(req.status_code == 429):
                 time.sleep(60)
             elif(req.status_code == 400):
-                print("Out of images for " + coreTag)
+                print("Out of images")
                 with open("src/DataGathering/Logging/currentPage.txt", "w") as pageFile:
                     pageFile.write(str(i) + "\n")
                     pageFile.close
@@ -84,27 +80,31 @@ def requestImageURLS(numReqs, file, coreTag, unacceptableWords, curPage, key, id
         #print("Length: " + str(len(jsonArray)))
         
         for item in jsonArray:
-            tags = item["tags"].split(", ")
+            retTags = item["tags"].split(", ")
             noBadTags = True
-            for tag in tags:
-                if(not noBadTags):
-                    continue
+            for tag in retTags:
                 #print("Current Tag: " + tag)
                 if(tag.lower() in unacceptableWords):
-                    #print("Bad Tag: " + tag)
                     noBadTags = False
+                    break
+            if(not noBadTags):
+                continue
 
             containsEverySearch = True
-            for x in range(2, sys.argv.__len__()):
-                if(not(sys.argv[x] in tags)):
+            for x in range(0, len(tags)):
+                if(not(tags[x] in retTags)):
                     containsEverySearch = False
+                    break
+            if(not containsEverySearch):
+                continue
             
-            if(noBadTags and containsEverySearch and (not (item["id"] in ids)) and coreTag in tags):
+            if(not (item["id"] in ids)):
                 totalAccepted += 1
                 file.write("Id: " + str(item["id"]) + "\n")
                 ids.append(item["id"])
                 file.write("Tags: " + item["tags"] + "\n")
                 file.write("URL: " + item["pageURL"] + "\n") 
+                file.write("Small Picture URL: " + item["webformatURL"] + "\n")
                 # print("Main URL: " + item["pageURL"])
                 # print("Preview URL: " + item["previewURL"])
         time.sleep(60)
@@ -112,11 +112,9 @@ def requestImageURLS(numReqs, file, coreTag, unacceptableWords, curPage, key, id
     return totalAccepted, ids
 
 def main():
-
-    if(sys.argv.__len__() < 3):
+    if(sys.argv.__len__() < 2):
         print("Please Make Sure You Provide Your Pixaby API Key")
         sys.exit()
-
     key = sys.argv[1]
 
     # I hate having to save my current Page in its own file but I every different combintion of reading and writing i try to keep it all
@@ -141,11 +139,19 @@ def main():
     
     with open("src/DataGathering/Logging/acceptableAiImagesPixabay.txt", "a") as file:
         totalAcceptableImages = 0
-        newImages, ids = requestImageURLS(10, file, "ai generated", unacceptableWords, currentPage, key, ids)
+        newImages, ids = requestImageURLS(10, file, ["ai generated ", "portrait", "man"], unacceptableWords, currentPage, key, ids)
         totalAcceptableImages += newImages
-        print(totalAcceptableImages)
-        newImages, ids = requestImageURLS(10,file, "ai", unacceptableWords, currentPage, key, ids)
+        newImages, ids = requestImageURLS(10,file, ["ai generated", "portrait", "woman"], unacceptableWords, currentPage, key, ids)
         totalAcceptableImages += newImages
+        newImages, ids = requestImageURLS(10, file, ["ai generated ", "close up", "man"], unacceptableWords, currentPage, key, ids)
+        totalAcceptableImages += newImages
+        newImages, ids = requestImageURLS(10,file, ["ai generated", "close up", "woman"], unacceptableWords, currentPage, key, ids)
+        totalAcceptableImages += newImages
+        newImages, ids = requestImageURLS(10, file, ["ai generated ", "portrait"], unacceptableWords, currentPage, key, ids)
+        totalAcceptableImages += newImages
+        newImages, ids = requestImageURLS(10,file, ["ai generated", "close up"], unacceptableWords, currentPage, key, ids)
+        totalAcceptableImages += newImages
+
         print(totalAcceptableImages)
         file.close()
 
