@@ -18,7 +18,7 @@ def main():
     print(length)
 
     with open(sys.argv[1]) as inputFile:
-        with open("src/DatasetProcessing/PixabyImages/downloadedIDs.txt", "a") as outputFile:
+        with open("/kaggle/working/Machine-Learning-Resume-Project/src/DatasetProcessing/PixabyImages/downloadedIDs.txt", "a") as outputFile:
             
             numberOfBadResponses = 0
             rand = random.Random()
@@ -27,7 +27,7 @@ def main():
             i = 0
             ids= []
 
-            with open("src/DatasetProcessing/PixabyImages/downloadedIDs.txt") as temp:
+            with open("/kaggle/working/Machine-Learning-Resume-Project/src/DatasetProcessing/PixabyImages/downloadedIDs.txt") as temp:
                 for line in temp:
                     ids.append(int(line.strip()))
 
