@@ -43,72 +43,74 @@ def requestImageURLS(numReqs, file, tags, unacceptableWords, curPage, key, ids):
     endPage = curPage+numReqs
     #print("Getting Images For " + coreTag)
     for i in range(curPage, endPage):
-        print("Page: " + str(i))
-        # constructing the rest api url
-        
-        url = "https://pixabay.com/api/?key=" + key + "&q=" + tags[0]
-        for x in range(1, len(tags)):
-                url += "+" + tags[x]
-        url += "&image_type=photo&page="+str(i+1)+"&per_page=100&safesearch=true&category=people"
-        req = requests.get(url=url)
-        if (req.status_code != 200):
-            print("Failed Request. Status Code: " + str(req.status_code))
-            # If Im Overdoing it on the api requests wait for a bit to reset my rate limit
-            if(req.status_code == 429):
-                time.sleep(60)
-            elif(req.status_code == 400):
-                print("Out of images")
-                with open("src/DataGathering/Logging/currentPage.txt", "w") as pageFile:
-                    pageFile.write(str(i) + "\n")
-                    pageFile.close
-                return totalAccepted, ids
-            else:
-                #If I'm getting a non rate limit error code then I need to close to program so I dont spam the pixabay servers
-                #with bad requests before I fix whatever issue I'm encountering. Logging the error text for posterity
-                with open("src/DataGathering/Logging/badRequestsLog.txt", "a") as logFile:
-                    logFile.write(str(req.status_code) + "\n")
-                    logFile.write(req.text + "\n")
-                    logFile.close()
-                #with open("src/DataGathering/Logging/currentPage.txt", "w") as pageFile:
-                #    pageFile.write(str(i) + "\n")
-                #    pageFile.close
-                file.close()
-                sys.exit()
-
-        jsonArray = req.json()['hits']
-
-        #print("Length: " + str(len(jsonArray)))
-        
-        for item in jsonArray:
-            retTags = item["tags"].split(", ")
-            noBadTags = True
-            for tag in retTags:
-                #print("Current Tag: " + tag)
-                if(tag.lower() in unacceptableWords):
-                    noBadTags = False
-                    break
-            if(not noBadTags):
-                continue
-
-            containsEverySearch = True
-            for x in range(0, len(tags)):
-                if(not(tags[x] in retTags)):
-                    containsEverySearch = False
-                    break
-            if(not containsEverySearch):
-                continue
+        order = ["popular", "latest"]
+        for ord in order:
+            print("Page: " + str(i) + " Order: " + ord)
+            # constructing the rest api url
             
-            if(not (item["id"] in ids)):
-                totalAccepted += 1
-                file.write("Id: " + str(item["id"]) + "\n")
-                ids.append(item["id"])
-                file.write("Tags: " + item["tags"] + "\n")
-                file.write("URL: " + item["pageURL"] + "\n") 
-                file.write("Small Picture URL: " + item["webformatURL"] + "\n")
-                # print("Main URL: " + item["pageURL"])
-                # print("Preview URL: " + item["previewURL"])
-        time.sleep(60)
+            url = "https://pixabay.com/api/?key=" + key + "&q=" + tags[0]
+            for x in range(1, len(tags)):
+                    url += "+" + tags[x]
+            url += "&image_type=photo&page="+str(i+1)+"&per_page=100&safesearch=true&category=people&order="+ord
+            req = requests.get(url=url)
+            if (req.status_code != 200):
+                print("Failed Request. Status Code: " + str(req.status_code))
+                # If Im Overdoing it on the api requests wait for a bit to reset my rate limit
+                if(req.status_code == 429):
+                    time.sleep(60)
+                elif(req.status_code == 400):
+                    print("Out of images")
+                    with open("src/DataGathering/Logging/currentPage.txt", "w") as pageFile:
+                        pageFile.write(str(i) + "\n")
+                        pageFile.close
+                    return totalAccepted, ids
+                else:
+                    #If I'm getting a non rate limit error code then I need to close to program so I dont spam the pixabay servers
+                    #with bad requests before I fix whatever issue I'm encountering. Logging the error text for posterity
+                    with open("src/DataGathering/Logging/badRequestsLog.txt", "a") as logFile:
+                        logFile.write(str(req.status_code) + "\n")
+                        logFile.write(req.text + "\n")
+                        logFile.close()
+                    #with open("src/DataGathering/Logging/currentPage.txt", "w") as pageFile:
+                    #    pageFile.write(str(i) + "\n")
+                    #    pageFile.close
+                    file.close()
+                    sys.exit()
+
+            jsonArray = req.json()['hits']
+
+            #print("Length: " + str(len(jsonArray)))
             
+            for item in jsonArray:
+                retTags = item["tags"].split(", ")
+                noBadTags = True
+                for tag in retTags:
+                    #print("Current Tag: " + tag)
+                    if(tag.lower() in unacceptableWords):
+                        noBadTags = False
+                        break
+                if(not noBadTags):
+                    continue
+
+                containsEverySearch = True
+                for x in range(0, len(tags)):
+                    if(not(tags[x] in retTags)):
+                        containsEverySearch = False
+                        break
+                if(not containsEverySearch):
+                    continue
+                
+                if(not (item["id"] in ids)):
+                    totalAccepted += 1
+                    file.write("Id: " + str(item["id"]) + "\n")
+                    ids.append(item["id"])
+                    file.write("Tags: " + item["tags"] + "\n")
+                    file.write("URL: " + item["pageURL"] + "\n") 
+                    file.write("Small Picture URL: " + item["webformatURL"] + "\n")
+                    # print("Main URL: " + item["pageURL"])
+                    # print("Preview URL: " + item["previewURL"])
+            time.sleep(60)
+                
     return totalAccepted, ids
 
 def main():
@@ -132,24 +134,38 @@ def main():
     ids = []
     with open("src/DataGathering/Logging/acceptableAIImagesPixabay.txt", "r") as file:
         for line in file:
-            ids.append(line[4:len(line)].strip())
+            ids.append(int(line[4:len(line)].strip()))
+            next(file, None)
             next(file, None)
             next(file, None)
         file.close()
     
     with open("src/DataGathering/Logging/acceptableAiImagesPixabay.txt", "a") as file:
         totalAcceptableImages = 0
-        newImages, ids = requestImageURLS(10, file, ["ai generated ", "portrait", "man"], unacceptableWords, currentPage, key, ids)
+        #newImages, ids = requestImageURLS(10, file, ["ai generated ", "portrait", "man"], unacceptableWords, currentPage, key, ids)
+        #totalAcceptableImages += newImages
+        #newImages, ids = requestImageURLS(10,file, ["ai generated", "portrait", "woman"], unacceptableWords, currentPage, key, ids)
+        #totalAcceptableImages += newImages
+        #newImages, ids = requestImageURLS(10, file, ["ai generated ", "close up", "man"], unacceptableWords, currentPage, key, ids)
+        #totalAcceptableImages += newImages
+        #newImages, ids = requestImageURLS(10,file, ["ai generated", "close up", "woman"], unacceptableWords, currentPage, key, ids)
+        #totalAcceptableImages += newImages
+        #newImages, ids = requestImageURLS(10, file, ["ai generated ", "portrait"], unacceptableWords, currentPage, key, ids)
+        #totalAcceptableImages += newImages
+        #newImages, ids = requestImageURLS(10,file, ["ai generated", "close up"], unacceptableWords, currentPage, key, ids)
+        #totalAcceptableImages += newImages
+
+        newImages, ids = requestImageURLS(10, file, ["ai generated ", "portrait", "man", "black and white"], unacceptableWords, currentPage, key, ids)
         totalAcceptableImages += newImages
-        newImages, ids = requestImageURLS(10,file, ["ai generated", "portrait", "woman"], unacceptableWords, currentPage, key, ids)
+        newImages, ids = requestImageURLS(10,file, ["ai generated", "portrait", "woman", "black and white"], unacceptableWords, currentPage, key, ids)
         totalAcceptableImages += newImages
-        newImages, ids = requestImageURLS(10, file, ["ai generated ", "close up", "man"], unacceptableWords, currentPage, key, ids)
+        newImages, ids = requestImageURLS(10, file, ["ai generated ", "close up", "man", "black and white"], unacceptableWords, currentPage, key, ids)
         totalAcceptableImages += newImages
-        newImages, ids = requestImageURLS(10,file, ["ai generated", "close up", "woman"], unacceptableWords, currentPage, key, ids)
+        newImages, ids = requestImageURLS(10,file, ["ai generated", "close up", "woman", "black and white"], unacceptableWords, currentPage, key, ids)
         totalAcceptableImages += newImages
-        newImages, ids = requestImageURLS(10, file, ["ai generated ", "portrait"], unacceptableWords, currentPage, key, ids)
+        newImages, ids = requestImageURLS(10, file, ["ai generated ", "portrait", "black and white"], unacceptableWords, currentPage, key, ids)
         totalAcceptableImages += newImages
-        newImages, ids = requestImageURLS(10,file, ["ai generated", "close up"], unacceptableWords, currentPage, key, ids)
+        newImages, ids = requestImageURLS(10,file, ["ai generated", "close up", "black and white"], unacceptableWords, currentPage, key, ids)
         totalAcceptableImages += newImages
 
         print(totalAcceptableImages)

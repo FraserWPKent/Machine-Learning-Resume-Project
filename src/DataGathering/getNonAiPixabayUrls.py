@@ -41,76 +41,78 @@ def requestImageURLS(numReqs, file, tags, unacceptableWords, curPage, key, ids):
     totalAccepted = 0
     endPage = curPage+numReqs
     for i in range(curPage, endPage):
-        print("Page: " + str(i))
-        # constructing the rest api url
-        url = "https://pixabay.com/api/?key=" + key + "&q=" + tags[0]
-        for x in range(1, len(tags)):
-            url += "+" + tags[x]
-        url += "&image_type=photo&page="+str(i+1)+"&per_page=100&safesearch=true&category=people"
-        req = requests.get(url=url)
-        if (req.status_code != 200):
-            print("Failed Request. Status Code: " + str(req.status_code))
-            # If Im Overdoing it on the api requests wait for a bit to reset my rate limit
-            if(req.status_code == 429):
-                time.sleep(120)
-            elif(req.status_code == 400):
-                print("Out of images")
-                with open("src/DataGathering/Logging/currentPageNonAi.txt", "w") as pageFile:
-                    pageFile.write(str(i) + "\n")
-                    pageFile.close
-                return totalAccepted, ids
-            else:
-                #If I'm getting a non rate limit error code then I need to close to program so I dont spam the pixabay servers
-                #with bad requests before I fix whatever issue I'm encountering. Logging the error text for posterity
-                with open("src/DataGathering/Logging/badRequestsLog.txt", "a") as logFile:
-                    logFile.write(str(req.status_code) + "\n")
-                    logFile.write(req.text + "\n")
-                    logFile.close()
-                with open("src/DataGathering/Logging/currentPage.txt", "w") as pageFile:
-                    pageFile.write(str(i) + "\n")
-                    pageFile.close
-                file.close()
-                sys.exit()
-
-        jsonArray = req.json()['hits']
-
-        #print("Length: " + str(len(jsonArray)))
-        
-        for item in jsonArray:
-            reqTags = item["tags"].split(", ")
-            noBadTags = True
-            for tag in reqTags:
-                #if(not noBadTags):
-                #    continue
-                #print("Current Tag: " + tag)
-                if(tag.lower() in unacceptableWords):
-                    #print("Bad Tag: " + tag)
-                    noBadTags = False
-                    break
-            if(not noBadTags):
-                continue
-            containsEverySearchTerm = True
+        order = ["popular", "latest"]
+        for ord in order:
+            print("Page: " + str(i))
+            # constructing the rest api url
+            url = "https://pixabay.com/api/?key=" + key + "&q=" + tags[0]
             for x in range(1, len(tags)):
-                if(not(sys.argv[x] in reqTags)):
-                    containsEverySearchTerm = False
-                    break
+                url += "+" + tags[x]
+            url += "&image_type=photo&page="+str(i+1)+"&per_page=100&safesearch=true&category=people&order=" + ord
+            req = requests.get(url=url)
+            if (req.status_code != 200):
+                print("Failed Request. Status Code: " + str(req.status_code))
+                # If Im Overdoing it on the api requests wait for a bit to reset my rate limit
+                if(req.status_code == 429):
+                    time.sleep(120)
+                elif(req.status_code == 400):
+                    print("Out of images")
+                    with open("src/DataGathering/Logging/currentPageNonAi.txt", "w") as pageFile:
+                        pageFile.write(str(i) + "\n")
+                        pageFile.close
+                    return totalAccepted, ids
+                else:
+                    #If I'm getting a non rate limit error code then I need to close to program so I dont spam the pixabay servers
+                    #with bad requests before I fix whatever issue I'm encountering. Logging the error text for posterity
+                    with open("src/DataGathering/Logging/badRequestsLog.txt", "a") as logFile:
+                        logFile.write(str(req.status_code) + "\n")
+                        logFile.write(req.text + "\n")
+                        logFile.close()
+                    with open("src/DataGathering/Logging/currentPage.txt", "w") as pageFile:
+                        pageFile.write(str(i) + "\n")
+                        pageFile.close
+                    file.close()
+                    sys.exit()
 
-            if(not containsEverySearchTerm):
-                continue
+            jsonArray = req.json()['hits']
 
-            # Checking To make sure that the images are older than ai image genreators being publically available and
-            # dont contain ai related tags just in case someone posted an older non public ai gerneated image
-            if((not (item["id"] in ids)) and (int(item["previewURL"][32:34]) < 22) and (not "ai generated" in tags) and (not "ai" in tags)):
-                totalAccepted += 1
-                file.write("Id: " + str(item["id"]) + "\n")
-                ids.append(item["id"])
-                file.write("Tags: " + item["tags"] + "\n")
-                file.write("Page URL: " + item["pageURL"] + "\n") 
-                file.write("Small Picture URL: " + item["webformatURL"] + "\n")
-                #print("Main URL: " + item["pageURL"])
-                #print("Preview URL: " + item["previewURL"])
-                #print("Preview URL: " + item["previewURL"][32:34])
-        time.sleep(60)
+            #print("Length: " + str(len(jsonArray)))
+            
+            for item in jsonArray:
+                reqTags = item["tags"].split(", ")
+                noBadTags = True
+                for tag in reqTags:
+                    #if(not noBadTags):
+                    #    continue
+                    #print("Current Tag: " + tag)
+                    if(tag.lower() in unacceptableWords):
+                        #print("Bad Tag: " + tag)
+                        noBadTags = False
+                        break
+                if(not noBadTags):
+                    continue
+                containsEverySearchTerm = True
+                for x in range(1, len(tags)):
+                    if(not(sys.argv[x] in reqTags)):
+                        containsEverySearchTerm = False
+                        break
+
+                if(not containsEverySearchTerm):
+                    continue
+
+                # Checking To make sure that the images are older than ai image genreators being publically available and
+                # dont contain ai related tags just in case someone posted an older non public ai gerneated image
+                if((not (item["id"] in ids)) and (int(item["previewURL"][32:34]) < 22) and (not "ai generated" in tags) and (not "ai" in tags)):
+                    totalAccepted += 1
+                    file.write("Id: " + str(item["id"]) + "\n")
+                    ids.append(item["id"])
+                    file.write("Tags: " + item["tags"] + "\n")
+                    file.write("Page URL: " + item["pageURL"] + "\n") 
+                    file.write("Small Picture URL: " + item["webformatURL"] + "\n")
+                    #print("Main URL: " + item["pageURL"])
+                    #print("Preview URL: " + item["previewURL"])
+                    #print("Preview URL: " + item["previewURL"][32:34])
+            time.sleep(60)
             
     return totalAccepted, ids
 
@@ -138,7 +140,7 @@ def main():
     ids = []
     with open("src/DataGathering/Logging/acceptableNonAiImagesPixabay.txt", "r") as file:
         for line in file:
-            ids.append(line[4:len(line)].strip())
+            ids.append(int(line[4:len(line)].strip()))
             next(file, None)
             next(file, None)
             next(file, None)

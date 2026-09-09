@@ -24,3 +24,7 @@ painting
 black and white
 couple
 group
+shoes
+feet
+statue
+sculpture
