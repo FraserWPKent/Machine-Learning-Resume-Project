@@ -73,9 +73,13 @@ def main():
                         print("Making To Many Requests Too Quickly")
                         minimumWait *= 2.1
                         numberOfBadResponses += 1
+                        if(numberOfBadResponses == 4):
+                            print("Got too many bad responses shutting down")
+                            print(reqResponse.text)
+                            sys.exit()
                         time.sleep(minimumWait + rand.random()*10.3)
                     elif(reqResponse.status_code != 200):
-                        if(numberOfBadResponses == 10):
+                        if(numberOfBadResponses == 4):
                             print("Got too many bad responses shutting down")
                             print(reqResponse.text)
                             sys.exit()
