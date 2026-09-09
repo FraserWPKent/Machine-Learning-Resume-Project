@@ -39,8 +39,8 @@ def main():
                 elif(((i+1)) % 80 == 0):
                     time.sleep(120 + rand.random()*30)
 
-                if(i > 24):
-                    sys.exit()
+                #if(i > 24):
+                #    sys.exit()
                 
                 # Getting the current images's id and then skipping the Tags, and Main URL
                 if(i % 4 == 0):
