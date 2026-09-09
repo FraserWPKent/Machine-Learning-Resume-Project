@@ -85,7 +85,7 @@ def main():
                             time.sleep(minimumWait + rand.random()*10.2)
                     imgData = reqResponse.content
 
-                    with open("src/DatasetProcessing/PixabyImages/Real/pix_real_image_" + str(numberOfImages) + ".jpg", "wb") as image:
+                    with open("/kaggle/working/Machine-Learning-Resume-Project/src/DatasetProcessing/PixabyImages/Real/pix_real_image_" + str(numberOfImages) + ".jpg", "wb") as image:
                         image.write(imgData)
                         numberOfImages += 1
                         outputFile.write(str(ids[len(ids)-1]) + "\n")
