@@ -79,7 +79,7 @@ def main():
                             sys.exit()
                         time.sleep(minimumWait + rand.random()*10.3)
                     elif(reqResponse.status_code != 200):
-                        if(numberOfBadResponses == 4):
+                        if(numberOfBadResponses >= 10):
                             print("Got too many bad responses shutting down")
                             print(reqResponse.text)
                             sys.exit()
@@ -87,6 +87,7 @@ def main():
                             print("Error code: " + str(reqResponse.status_code))
                             print(str(reqResponse.text))
                             time.sleep(minimumWait + rand.random()*10.2)
+                            numberOfBadResponses+=1
                     imgData = reqResponse.content
 
                     with open("/kaggle/working/Machine-Learning-Resume-Project/src/DatasetProcessing/PixabyImages/Real/pix_real_image_" + str(numberOfImages) + ".jpg", "wb") as image:

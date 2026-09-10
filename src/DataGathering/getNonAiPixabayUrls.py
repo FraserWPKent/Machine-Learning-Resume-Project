@@ -93,7 +93,7 @@ def requestImageURLS(numReqs, file, tags, unacceptableWords, curPage, key, ids):
                     continue
                 containsEverySearchTerm = True
                 for x in range(1, len(tags)):
-                    if(not(sys.argv[x] in reqTags)):
+                    if(not(tags[x] in reqTags)):
                         containsEverySearchTerm = False
                         break
 
