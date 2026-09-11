@@ -130,7 +130,7 @@ def trainingPrep(trainingLoader, validationLoader, epochs, tag):
         #         param_group['lr'] = 0.0005
         #         currentLr = 0.0005
 
-        if(accuracy > mostAccurate or epoch+1%10 == 0):
+        if(accuracy > mostAccurate or epoch+1%10 == 0 or epoch+1 >= epochs):
             if(accuracy > mostAccurate):
                 mostAccurate = accuracy
             print(f"Saving the model: ")
