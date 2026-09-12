@@ -59,7 +59,9 @@ def adjustLearningRate(currentLR, currentEpoch, endEpoch):
 def trainingPrep(trainingLoader, validationLoader, epochs, tag):
     model = ma.ModelArch()
     #filePath
-    if(tag):
+    if(tag == 2):
+        filePath="/content/Machine-Learning-Resume-Project/models"
+    elif(tag == 1):
         filePath="/kaggle/working/Machine-Learning-Resume-Project/models/"
     else:
         filePath="models/"
@@ -92,50 +94,33 @@ def trainingPrep(trainingLoader, validationLoader, epochs, tag):
     for epoch in range(epochs):
         print("Epoch: " + str(epoch+1))
         model.train()
-        trainingLoss =trainingBlock(trainingLoader, model, optimizer, lossFunction, epoch)
+        trainingAccuracy, trainingLoss =trainingBlock(trainingLoader, model, optimizer, lossFunction, epoch)
         # print("Trained")
         model.eval()
-        accuracy = validationBlock(validationLoader, model, optimizer, lossFunction, epoch)
+        validationAccuracy, validationLoss = validationBlock(validationLoader, model, optimizer, lossFunction, epoch)
 
-        print("Epoch: " + str(epoch+1) + "/"+ str(epochs) + " Training Loss: " + str(round(trainingLoss,5)) + " Accuracy: " + str(round(accuracy*100, 3)) + " %") 
+        print("Epoch: " + str(epoch+1) + "/"+ str(epochs) + " Training Loss: " + str(round(trainingLoss,5)) + " Training Accuracy: " + str(round(trainingAccuracy*100, 3)) + "% Validation Loss: " + str(round(validationLoss,5)) + " Validation Accuracy: " + str(round(validationAccuracy*100, 3)) + " %") 
 
 
         #for i in range(0, 4):
         #    previousAccuracies[i] = previousAccuracies[i+1]
         #previousAccuracies[4] = accuracy
-
+        
+        #print("Lowering the ")
         newLr = adjustLearningRate(currentLr, epoch, epochs)
-        print(newLr)
+        #print(newLr)
         #Changing the Learning Rate to half the old rate and resetting the previous accuracies rate so we can re check if 
         if(newLr != currentLr):
             for param_group in optimizer.param_groups:
                 param_group['lr'] = newLr
                 currentLr = newLr
-            #for i in range(len(previousAccuracies)):
-            #    previousAccuracies[i] = 0.0
 
-        # if(accuracy > 0.975 and currentLr == 0.0001):
-        #     print("Accracy Above 90%. Setting Learning Rate To: 0.0001")
-        #     for param_group in optimizer.param_groups:
-        #         param_group['lr'] = 0.00001
-        #         currentLr = 0.00001
-        # elif(accuracy > 0.95 and currentLr == 0.0005):
-        #     print("Accracy Above 90%. Setting Learning Rate To: 0.0001")
-        #     for param_group in optimizer.param_groups:
-        #         param_group['lr'] = 0.0001
-        #         currentLr = 0.0001
-        # elif(accuracy > 0.9 and currentLr == 0.001):
-        #     print("Accracy Above 75%. Setting Learning Rate To: 0.0005")
-        #     for param_group in optimizer.param_groups:
-        #         param_group['lr'] = 0.0005
-        #         currentLr = 0.0005
-
-        if(accuracy > mostAccurate or epoch+1%10 == 0 or epoch+1 >= epochs):
-            if(accuracy > mostAccurate):
-                mostAccurate = accuracy
+        if(validationAccuracy > mostAccurate or epoch+1%10 == 0 or epoch+1 >= epochs):
+            if(validationAccuracy > mostAccurate):
+                mostAccurate = validationAccuracy
             print(f"Saving the model: ")
             with open(filePath+"savedNames.txt", "a") as file:
-                name = "model_" + str(accuracy*100)[0:4] + "_" + str(trainingLoss)[0:6] + "_" + (time.ctime(time.time()).replace(" ", "_").replace(":", "_"))
+                name = "model_" + str(trainingAccuracy*100)[0:4] + "_" + str(trainingLoss)[0:6] + "_" + str(validationAccuracy*100)[0:4] + "_" + str(validationLoss)[0:6] + "_" + (time.ctime(time.time()).replace(" ", "_").replace(":", "_"))
                 file.write(name + "\n")
                 torch.save(model.state_dict(), (filePath+"saves/"+name))
                 file.close()        
@@ -146,6 +131,7 @@ def trainingBlock(trainingLoader, model, optimizer, lossFunction, epochIndex):
     device = torch.device("cuda")
 
     totalLoss = 0.0
+    accTotal = 0.0
 
     # Does this do anything??? I dont remember writing this and I dont know if it does anything but its such a small thing that
     # I'm going to leave it assuming the me who wrote this wasnt totally insane
@@ -169,42 +155,36 @@ def trainingBlock(trainingLoader, model, optimizer, lossFunction, epochIndex):
         optimizer.step()
         
         totalLoss += loss.item()
-        #if (i+1) % 25 == 0:
-        #    lastLoss = runningLoss / 25 # loss per batch
-        #    print(f'  batch {i + 1} loss: {lastLoss}')
-            #tb_x = epochIndex * len(trainingLoader) + i + 1
-            #tb_writer.add_scalar('Loss/train', last_loss, tb_x)
-        #    runningLoss = 0.0
-        #    x=0
-            #itemsProcessed -= x
+        probabilities = torch.sigmoid(outputs.view(-1))
+        predictions = (probabilities>=0.5).float()
+        
+        accTotal += (predictions==labels.float().view(-1)).sum().item()
 
     #print(time.time()-startTime)
-    return (totalLoss/len(trainingLoader))
+    return (accTotal/len(trainingLoader.dataset)), (totalLoss/len(trainingLoader))
 
 def validationBlock(validationLoader, model, optimizer, lossFunction, epochIndex):
     #print(len(validationLoader))
     device = torch.device("cuda")
     loss = 0.0
-    total = 0.0
+    accTotal = 0.0
+    lossTotal = 0.0
    
     with torch.no_grad():
         for i, data in enumerate(validationLoader):
             items, labels = data[0].to(device), data[1].float().to(device)
 
             outputs = model(items)
-
+            
             probabilities = torch.sigmoid(outputs.view(-1))
             predictions = (probabilities>=0.5).float()
 
-            #print("Predictions")
-            #print(predictions.unique(return_counts=True))
-            #print("Labels")
-            #print(labels.unique(return_counts=True))
-
-            total += (predictions==labels.float().view(-1)).sum().item()
-            #print(total)
-        print(total)
-        print(len(validationLoader.dataset))
-        return total/(len(validationLoader.dataset))
+            accTotal += (predictions==labels.float().view(-1)).sum().item()
+            lossTotal += lossFunction(outputs, labels).item()
+            #print(accTotal)
+        print(accTotal)
+        print(len(validationLoader))
+        return (accTotal/(len(validationLoader.dataset))), (lossTotal/(len(validationLoader)))
             
+
 
