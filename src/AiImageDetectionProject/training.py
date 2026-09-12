@@ -60,7 +60,7 @@ def trainingPrep(trainingLoader, validationLoader, epochs, tag):
     model = ma.ModelArch()
     #filePath
     if(tag == 2):
-        filePath="/content/Machine-Learning-Resume-Project/models"
+        filePath="/content/Machine-Learning-Resume-Project/models/"
     elif(tag == 1):
         filePath="/kaggle/working/Machine-Learning-Resume-Project/models/"
     else:
