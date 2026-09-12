@@ -18,8 +18,8 @@ def main():
         # Initializing the Build Datasets when working on google colab
         trainingDataset = db.AiImageDetectorDataset("/content/drive/MyDrive/ImageDataset/Training", training=True)
         testingDataset = db.AiImageDetectorDataset("/content/drive/MyDrive/ImageDataset/Validate", training=False)
-        trainingLoader = DataLoader(trainingDataset, shuffle=True, batch_size=128, num_workers=4, pin_memory=True)
-        testingLoader = DataLoader(testingDataset, shuffle=False, batch_size=128, num_workers=4, pin_memory=True)
+        trainingLoader = DataLoader(trainingDataset, shuffle=True, batch_size=128, num_workers=2, pin_memory=True)
+        testingLoader = DataLoader(testingDataset, shuffle=False, batch_size=128, num_workers=2, pin_memory=True)
     elif(int(sys.argv[2]) == 1):
         # Initializing the Build Datasets when working on kaggle
         trainingDataset = db.AiImageDetectorDataset("/kaggle/input/datasets/williamkent1234321/updated-ai-image-detected-dataset/Training", training=True)
