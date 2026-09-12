@@ -83,8 +83,8 @@ def trainingPrep(trainingLoader, validationLoader, epochs, tag):
     lossFunction = nn.BCEWithLogitsLoss()
     
     #Initializes a Adam W optimizer to be used in my training Loop
-    currentLr = 0.001
-    optimizer = torch.optim.AdamW(model.parameters(), lr=0.001)
+    currentLr = 0.0001
+    optimizer = torch.optim.AdamW(model.parameters(), lr=0.0001)
     #optimizer = torch.optim.SGD(model.parameters())
 
     # fails = 0
