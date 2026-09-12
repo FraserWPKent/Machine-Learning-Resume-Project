@@ -14,7 +14,7 @@ def main():
         print("Not Enough Arguments")
         sys.exit()
 
-    if(int(sys.argv[2] == 2)):
+    if(int(sys.argv[2]) == 2):
         # Initializing the Build Datasets when working on google colab
         trainingDataset = db.AiImageDetectorDataset("/content/drive/MyDrive/ImageDataset/Training", training=True)
         testingDataset = db.AiImageDetectorDataset("/content/drive/MyDrive/ImageDataset/Validate", training=False)
